@@ -9,21 +9,27 @@ export async function runAgent(userPrompt, knowledgeTable) {
 
   const response = await generateText({
     model,
-    system: `You are a database analyst for SQLite. You goal is to help the user by answering their question properly.
+    system: `You are a database analyst for SQLite. Your goal is to help the user by answering their question properly.
 Given the following database schema context:
 
 ${knowledgeTable}
 
-Then answer the user's question, using the tools available to propose and execute the appropriate SQLite SQL query.
+To answer the user's question, use the "generateSql" tool. Always pass the SQL query string in the "sql" parameter, e.g. {"sql": "SELECT ..."};
 After running the tool, summarize the answer concisely based on the query results.`,
     prompt: userPrompt,
     tools: {
       generateSql: tool({
         description: 'Generate and execute a SQLite SQL query based on user question and database schema.',
         parameters: z.object({
-          sql: z.string().describe('The SQLite SQL query to execute.'),
-        }),
-        execute: ({ sql }) => runSql(sql)
+          sql: z.string().optional().describe('The SQLite SQL query to execute.'),
+        }).passthrough(),
+        execute: async (args) => {
+          let sql = typeof args === 'string'
+            ? args
+            : (args?.sql || args?.query || args?.sql_query || args?.input || (args && typeof args === 'object' ? Object.values(args).find(v => typeof v === 'string') : null));
+
+          return runSql(sql);
+        }
       }),
     },
     maxSteps: 5,
@@ -33,6 +39,11 @@ After running the tool, summarize the answer concisely based on the query result
 }
 
 async function runSql(sql) {
+  if (!sql || typeof sql !== 'string' || !sql.trim()) {
+    console.error('\n❌ Execution Error: No valid SQL query was provided by the model.\n');
+    return { status: 'error', error: 'No valid SQL query string provided.' };
+  }
+
   console.log(`\nProposed SQL Query:\n\x1b[36m${sql}\x1b[0m\n`);
 
   const shouldRun = await confirm({
@@ -59,4 +70,5 @@ async function runSql(sql) {
     return { status: 'error', error: err.message };
   }
 }
+
 
