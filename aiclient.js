@@ -1,22 +1,21 @@
-import OpenAI from 'openai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
-function createAIClient() {
-  return new OpenAI({
-    apiKey: process.env.LLM_API_KEY,
+export function getLanguageModel() {
+  const provider = process.env.LLM_PROVIDER || 'local';
+
+  if (provider === 'gemini') {
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GEMINI_API_KEY || process.env.LLM_API_KEY,
+    });
+    return google(process.env.LLM_MODEL || 'gemini-1.5-flash');
+  }
+
+  const openai = createOpenAI({
+    apiKey: process.env.LLM_API_KEY || 'lm-studio',
     baseURL: process.env.LLM_API_URL || 'http://localhost:11434/v1',
   });
+
+  return openai(process.env.LLM_MODEL || 'default-model');
 }
 
-// Usage in your CLI:
-const ai = createAIClient();
-
-export async function chat(message) {
-    
-    const response = await ai.responses.create({
-        model: process.env.LLM_MODEL,
-        input: message,
-    });
-
-   return response.output_text
-
-}

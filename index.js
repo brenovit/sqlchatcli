@@ -1,11 +1,12 @@
 import 'dotenv/config';
-import { input, confirm } from '@inquirer/prompts';
-import { db } from './data_db.js';
+import { input } from '@inquirer/prompts';
 import { getKnowledgeTable } from './knowledge_db.js';
-import { generateSqlQuery } from './prompt.js';
+import { seedKnowledgeTable } from './seed_knowledge_db.js';
+import { runAgent } from './prompt.js';
 
 async function main() {
   console.log('🤖 Data Chat CLI initialized. Type "exit" or "q" to quit.\n');
+  seedKnowledgeTable();
   const knowledgeTable = getKnowledgeTable();
 
   while (true) {
@@ -20,31 +21,9 @@ async function main() {
 
     try {
       console.log('\nThinking...');
-      // 2. Generate SQL
-      const generatedSql = await generateSqlQuery(userPrompt, knowledgeTable);
-
-      console.log(`\nProposed SQL Query:\n\x1b[36m${generatedSql}\x1b[0m\n`);
-
-      // 3. User Confirmation (Human-in-the-Loop)
-      const shouldRun = await confirm({
-        message: 'Do you want to execute this query against your database?',
-        default: true
-      });
-
-      if (!shouldRun) {
-        console.log('Query execution canceled by user.\n');
-        continue;
-      }
-
-      // 4. Run Query
-      console.log('Executing query...');
-      const queryResult = db.prepare(generatedSql).all();
-
-      // 5. Answer
-      if (queryResult.length > 0) {
-        console.table(queryResult);
-      } else {
-        console.log('(no rows returned)');
+      const responseText = await runAgent(userPrompt, knowledgeTable);
+      if (responseText && responseText.trim()) {
+        console.log(`\n🤖 ${responseText.trim()}\n`);
       }
     } catch (err) {
       console.error(`\n❌ Error: ${err.message}\n`);
