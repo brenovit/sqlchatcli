@@ -23,13 +23,7 @@ After running the tool, summarize the answer concisely based on the query result
         parameters: z.object({
           sql: z.string().optional().describe('The SQLite SQL query to execute.'),
         }).passthrough(),
-        execute: async (args) => {
-          let sql = typeof args === 'string'
-            ? args
-            : (args?.sql || args?.query || args?.sql_query || args?.input || (args && typeof args === 'object' ? Object.values(args).find(v => typeof v === 'string') : null));
-
-          return runSql(sql);
-        }
+        execute: generateSqlExecution
       }),
     },
     maxSteps: 5,
@@ -37,8 +31,15 @@ After running the tool, summarize the answer concisely based on the query result
 
   return response.text;
 }
+async function generateSqlExecution(input) {
+  let sql = sanitizeInput(input);
+
+  console.log("generateSqlExecution", sql)
+  return await runSql(sql)
+}
 
 async function runSql(sql) {
+  console.log("sql", sql)
   if (!sql || typeof sql !== 'string' || !sql.trim()) {
     console.error('\n❌ Execution Error: No valid SQL query was provided by the model.\n');
     return { status: 'error', error: 'No valid SQL query string provided.' };
@@ -71,4 +72,10 @@ async function runSql(sql) {
   }
 }
 
+function sanitizeInput(input) {
+  console.log("Input from model", input)
 
+  return typeof args === 'string'
+    ? args
+    : (args?.sql || args?.query || args?.sql_query || args?.input || (args && typeof args === 'object' ? Object.values(args).find(v => typeof v === 'string') : null));
+}
