@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
 
-export const db = new Database('app.db');
+export const db = new Database('assets/app.db');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (

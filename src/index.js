@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import { input } from '@inquirer/prompts';
-import { getKnowledgeTable } from './knowledge_db.js';
-import { seedKnowledgeTable } from './seed_knowledge_db.js';
-import { runAgent } from './prompt.js';
+import { getKnowledgeTable } from './db/knowledge_db.js';
+import { seedKnowledgeTable } from './utils/seed_knowledge_db.js';
+import { runAgent } from './agent/agent.js';
 
 async function main() {
   console.log('🤖 Data Chat CLI initialized. Type "exit" or "q" to quit.\n');
@@ -22,6 +22,7 @@ async function main() {
     try {
       console.log('\nThinking...');
       const responseText = await runAgent(userPrompt, knowledgeTable);
+
       if (responseText && responseText.trim()) {
         console.log(`\n🤖 ${responseText.trim()}\n`);
       }

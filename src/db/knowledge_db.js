@@ -1,7 +1,10 @@
 import Database from 'better-sqlite3';
 
-const dbName = process.env.DB_NAME || 'app';
-const dbFileName = process.env.DB_NAME ? `${process.env.DB_NAME}_app.db` : 'app.db';
+const dbFileName = process.env.DB_NAME ? `assets/${process.env.DB_NAME}_app.db` : undefined;
+
+if (!dbFileName) {
+  throw Error("Source database not defined, set it as 'DB_NAME' on .env file")
+}
 
 export const knowledgeDb = new Database(dbFileName);
 

@@ -1,4 +1,4 @@
-import { knowledgeDb } from './knowledge_db.js';
+import { knowledgeDb } from '../db/knowledge_db.js';
 
 export function seedKnowledgeTable() {
   const { count } = knowledgeDb.prepare('SELECT COUNT(*) AS count FROM knowledge_table').get();
