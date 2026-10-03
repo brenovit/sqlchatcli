@@ -7,8 +7,8 @@ import { db } from '../db/app_db.js';
 export const generateSqlExecutionTool = tool({
     description: 'Generate and execute a SQLite SQL query based on user question and database schema.',
     parameters: z.object({
-        sql: z.string().optional().describe('The SQLite SQL query to execute.'),
-    }).passthrough(),
+        sql: z.string().describe('The SQLite SQL query to execute.'),
+    }),
     execute: generateSqlExecution,
 })
 
