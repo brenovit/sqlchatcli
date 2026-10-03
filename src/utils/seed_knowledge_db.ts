@@ -1,9 +1,9 @@
 import { knowledgeDb } from '../db/knowledge_db.js';
 
 export function seedKnowledgeTable() {
-  const { count } = knowledgeDb.prepare('SELECT COUNT(*) AS count FROM knowledge_table').get();
+  const row = knowledgeDb.prepare('SELECT COUNT(*) AS count FROM knowledge_table').get() as { count: number } | undefined;
 
-  if (count === 0) {
+  if (row && row.count === 0) {
     knowledgeDb.exec(`
     INSERT INTO knowledge_table (table_name, column_name, data_type, description) VALUES
       ('products', 'product_id',          'INTEGER', 'Primary key. Uniquely identifies a product (the catalog item under which stock movements occur).'),

@@ -5,8 +5,9 @@ export function getLanguageModel() {
   const provider = process.env.LLM_PROVIDER || 'local';
 
   if (provider === 'gemini') {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.LLM_API_KEY;
     const google = createGoogleGenerativeAI({
-      apiKey: process.env.GEMINI_API_KEY || process.env.LLM_API_KEY,
+      ...(apiKey ? { apiKey } : {}),
     });
     return google(process.env.LLM_MODEL || 'gemini-1.5-flash');
   }

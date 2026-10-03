@@ -18,8 +18,15 @@ knowledgeDb.exec(`
 `);
 
 // Helper to extract schema information for LLM context
-export function getKnowledgeTable() {
-  return JSON.stringify(knowledgeDb.prepare('SELECT * FROM knowledge_table').all());
+export interface KnowledgeRecord {
+  table_name: string;
+  column_name: string | null;
+  data_type: string | null;
+  description: string | null;
+}
+export function getKnowledgeTable(): string {
+  const rows = knowledgeDb.prepare('SELECT * FROM knowledge_table').all() as KnowledgeRecord[];
+  return JSON.stringify(rows);
 }
 
 

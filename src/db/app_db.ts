@@ -25,9 +25,9 @@ db.exec(`
   );
 `);
 
-const { count } = db.prepare('SELECT COUNT(*) AS count FROM products').get();
+const row = db.prepare('SELECT COUNT(*) AS count FROM products').get() as { count: number } | undefined;
 
-if (count === 0) {
+if (row && row.count === 0) {
   db.exec(`
   INSERT INTO products (product_name, vendor_managed_flag, unit, storage_capacity, stocked_date, discontinued_date) VALUES
     ('Organic Almond Milk', 0, 'LITER', 10.00, '2024-05-16', '2027-04-23'),

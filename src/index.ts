@@ -27,7 +27,8 @@ async function main() {
         console.log(`\n🤖 ${responseText.trim()}\n`);
       }
     } catch (err) {
-      console.error(`\n❌ Error: ${err.message}\n`);
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`\n❌ Error: ${message}\n`);
     }
   }
 }

@@ -1,4 +1,4 @@
-export function SYSTEM_PROMPT(knowledgeTable) {
+export function SYSTEM_PROMPT(knowledgeTable: string): string {
     return `You are a database analyst for SQLite. Your goal is to help the user by answering their question properly.
 Given the following database schema context:
 
