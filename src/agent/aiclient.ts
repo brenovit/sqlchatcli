@@ -17,6 +17,6 @@ export function getLanguageModel() {
     baseURL: process.env.LLM_API_URL || 'http://localhost:11434/v1',
   });
 
-  return openai(process.env.LLM_MODEL || 'default-model');
+  return openai.chat(process.env.LLM_MODEL || 'default-model');
 }
 
